@@ -16,6 +16,7 @@
 #define import_xnames
 #include <iraf.h>
 
+#include <ctype.h>
 #include "config.h"
 #include "grammar.h"
 #include "opcodes.h"
@@ -82,18 +83,18 @@ int	ninterrupts;		/* number of onint() calls per task	*/
 int	currentline;		/* current line being executed		*/
 int	errorline;		/* error line being recovered		*/
 long	cpustart, clkstart;	/* starting cpu, clock times if bkg	*/
-int	logout_status = 0;	/* optional status arg to logout() 	*/
+int	logout_status = 0;	/* optional status arg to logout()	*/
 
 extern  XINT samp;		/* samp handle				*/
 extern  int samp_registered;
 
-static  void execute();
-static  void login(), logout();
-static  void startup(), shutdown();
+static void execute();
+static void login(), logout();
+static void startup(), shutdown();
 static  char *file_concat (char  *in1, char  *in2);
 
-extern  void c_xwhen(), onint();
-extern  int yyparse();
+extern void c_xwhen(), onint();
+extern int yyparse();
 
 static  char *tmpfile = NULL;
 extern	char epar_cmdbuf[];
@@ -270,7 +271,6 @@ execute (int mode)
 	XINT	old_parhead;
 	char	*curcmd();
 	extern  char *onerr_handler;
-
 
 	alldone = 0;
 	gologout = 0;
@@ -505,7 +505,6 @@ login (char *cmd)
 	    }
 	}
 
-
 	/* Copy any user supplied host command line arguments into the
 	 * CL parameter $args to use in the startup script (for instance).
 	 */
@@ -531,21 +530,21 @@ login (char *cmd)
 	    compile (REDIRIN);
 	    compile (EXEC);
 
-	} else if (c_access (loginfile,0,0) == NO) {
-	    char *home = envget ("HOME");
-	    char global[SZ_LINE];
+        } else if (c_access (loginfile,0,0) == NO) {
+            char *home = envget ("HOME");
+            char global[SZ_LINE];
 
-	    memset (global, 0, SZ_LINE);
-	    sprintf (global, "%s/.iraf/login.cl", home);
-	    if (c_access (global, 0, 0) == YES) {
-	        o.o_val.v_s = global;
-	        compile (CALL, "cl");
-	        compile (PUSHCONST, &o);
-	        compile (REDIRIN);
-	        compile (EXEC);
-	    } else {
-	        printf ("Warning: no login.cl found in login directory\n");
-	    }
+            memset (global, 0, SZ_LINE);
+            sprintf (global, "%s/.iraf/login.cl", home);
+            if (c_access (global, 0, 0) == YES) {
+                o.o_val.v_s = global;
+                compile (CALL, "cl");
+                compile (PUSHCONST, &o);
+                compile (REDIRIN);
+                compile (EXEC);
+            } else {
+                printf ("Warning: no login.cl found in login directory\n");
+            }
 
 	} else {
 	    o.o_val.v_s = loginfile;
