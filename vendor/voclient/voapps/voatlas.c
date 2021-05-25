@@ -241,7 +241,7 @@ voatlas (int argc, char **argv, size_t *reslen, void **result)
 	dlname = oname;			    /* output name specified	*/
     } else if (do_samp) {
 	strcpy (tmp, "/tmp/voatlasXXXXXX");    /* temp download name	*/
-	mktemp (tmp);
+	mkstemp (tmp);
 	dlname = tmp;
     } else {
 	if (field)
@@ -296,7 +296,7 @@ voatlas (int argc, char **argv, size_t *reslen, void **result)
 	    status = ERR;
 	    goto done_;
     } else if (field) {
-	if (voa_resolveField (field, &ra, &dec) == OK) {
+	if (voa_resolveField (field, &ra, &dec) != OK) {
 	    fprintf (stderr, "Error: cannot resolve object '%s'\n", field);
 	    status = ERR;
 	    goto done_;
@@ -507,8 +507,8 @@ voa_callService (char *svc_url, double ra, double dec, double size,
 	(list_surveys ? NULL : (graphic ? "image/jpeg" : "image/fits")));
 
 
-    if (VOAPP_DEBUG) {
-        fprintf (stderr, "Executing Query:\n  %s\n\n", 
+    if (VOAPP_DEBUG || debug) {
+        fprintf (stderr, "Executing Query:\n\t'%s'\n\n", 
             voc_getQueryString (query, SIAP_CONN, 0));
     }
         

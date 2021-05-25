@@ -153,7 +153,9 @@ vot_callConeSvc (svcParams *pars)
 
  	    if (!result)
    	        vot_dalExit (E_NODATA, 0);
-	    else if (pars->fmt != F_RAW)
+	    //else if (pars->fmt != F_RAW && pars->fmt != (F_RAW|F_XML))
+	    //else if (pars->fmt != F_RAW)
+	    else if (! (pars->fmt | F_RAW) )
 		res_count = vot_extractResults (result, delim, pars);
 	    else 
 		res_count = vot_countResults (result);
@@ -210,7 +212,7 @@ vot_callConeSvc (svcParams *pars)
 	    }
 
 	    if (output && output[0] == '-' && (! extract & EX_COLLECT)) {
-	        write (fileno(stdout), result, strlen (result)-1);
+	        write (fileno(stdout), result, strlen (result));
 
 	    } else if (format != (F_CSV|F_HTML) && format != (F_CSV|F_KML)) {
 
@@ -223,7 +225,7 @@ vot_callConeSvc (svcParams *pars)
 	        if (pars->fmt = F_CSV || pars->fmt == F_TSV)
 		    vot_printHdr (fd, pars);
                 */
-	        write (fd, result, strlen (result)-1);
+	        write (fd, result, strlen (result));
 	        close (fd);
 	    }
 	}

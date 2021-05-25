@@ -748,7 +748,7 @@ vot_regIsCached (char *id, char *type, char *bpass)
     char *fname = vot_regCacheName (id, type, bpass);
     char *s, *line[SZ_LINE];
     struct stat st;
-    time_t now = time ((time_t)NULL);
+    time_t now = time ((time_t *)NULL);
     FILE *fd;
 
 
@@ -792,8 +792,8 @@ static char *
 vot_regGetCacheResults (char *fname, int *nres)
 {
     FILE *fd;
-    int  nr, size;
-    char line[SZ_LINE], *results;
+    int  nr=0, size=0;
+    char line[SZ_LINE], *results = NULL;
 
     memset (line, 0, SZ_LINE);
     if ((fd = fopen (fname, "r")) != (FILE *) NULL) {
