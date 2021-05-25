@@ -58,8 +58,6 @@ extern int	cllogmode;		/* NOT a *(struct param), see modes.c */
 #define LOG_ERRORS     0004
 #define LOG_TRACE      0010
 
-
-
 /* CL parameters for Eparam and Ehistory options.
  */
 extern int 	ep_standout, 

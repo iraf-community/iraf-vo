@@ -26,7 +26,7 @@ relink:
 	    $endif
 	    $ifolder (ytab.c,  grammar.y)
 		$echo "rebuilding ytab.c"
-		$ifeq (MACH, linux, redhat, suse)
+		$ifeq (MACH, linux)
 		    !yacc -vd grammar.y; 
 		    !egrep -v "\<stdlib.h\>" y.tab.c > ytab.c; 
 		    !egrep -v "\<stdio.h\>" ytab.c > ntab.c; mv ntab.c ytab.c
@@ -57,7 +57,6 @@ relink:
 
 	$update libpkg.a
 
-	#$set	xflags = "$(xflags) -x -/DYYDEBUG"
 	$set	xflags = "$(xflags) -x -/I../../vendor/ -I./"
 	$omake  vocl.x
 	$omake	globals.c <libc/libc.h> <libc/stdio.h> <libc/spp.h>\
@@ -84,7 +83,6 @@ install:
 	;
 
 libpkg.a:
-	#$set	xflags = "$(xflags) -qx -/DYYDEBUG"
 	$set	xflags = "$(xflags) -x -/I../../vendor/ -I./"
 
 	binop.c		<libc/spp.h> <libc/libc.h> <libc/xnames.h>\

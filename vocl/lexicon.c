@@ -8,6 +8,8 @@
 #define	import_lexnum
 #include <iraf.h>
 
+#include "proto.h"
+
 extern	int	cldebug;
 
 /*
@@ -112,12 +114,12 @@ yylex (void)
  *	\				single character escape
  *	!				os escape
  *	#				comment
- *	&				spawn background job		*
+ *	&				spawn background job
  *	(				lparen
  *	+				plus (switch)
  *	-				minus (switch)
- *	;				eost				*
- *	=				equals				*
+ *	;				eost
+ *	=				equals
  *	+=				add and set
  *	-=				subtract and set
  *	*=				multiply and set
@@ -338,8 +340,7 @@ etok_:		if (!newtoken) {
 		}
 
 	    case '?':
-		/*  ?, ?? menu commands, recognized only at beginning of stmt 
-		 */
+		/* ?, ?? menu commands, recognized only at beginning of stmt */
 		if (lexcol > 1) {
 		    goto deposit_;
 		} else if (ch = input()) {

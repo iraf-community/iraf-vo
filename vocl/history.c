@@ -79,9 +79,10 @@ typedef struct {
 PollFd  *poll_fd	= (PollFd *) NULL;
 
 
-extern	int _lexmodes;			/* enable lexical mode switching  */
-extern	char *ifseen;			/* Processing an IF statement?	  */
-extern	int do_error;			/* Are we processing errors?	  */
+extern	int _lexmodes;		/* enable lexical mode switching	*/
+extern	char *ifseen;		/* Processing an IF statement?		*/
+
+extern	int do_error;		/* Are we processing errors?		*/
 
 extern  char samp_cmd[];		/* samp command buffer		  */
 extern  pthread_mutex_t samp_mutex;
@@ -94,13 +95,12 @@ char   *freadline (char *prompt);
 int     add_history (char *buf);
 
 
-
 /* YY_GETC -- Called by the modified yylex() "input" macro in the lexical
  * analysis stage of the parser to get the next character from the input
  * stream.  When EOF is reached on the stream, add the "bye" command to
  * the logfile.
  */
-int 
+int
 yy_getc (FILE *fp)
 {
 	register char ch;
@@ -113,7 +113,7 @@ yy_getc (FILE *fp)
 		return (EOF);
 	    }
 
-	return ((int) ch);
+	return (ch);
 }
 
 
@@ -123,7 +123,7 @@ yy_getc (FILE *fp)
  * if logging is enabled, a command will not be logged which aborts or is
  * interrupted.
  */
-void 
+void
 yy_startblock (int logflag)
 {
 	register char *ip;
@@ -149,7 +149,8 @@ yy_startblock (int logflag)
 	    }
 	}
 
-	if (cldebug) eprintf ("startblock: ifseen=%d\n", ifseen);
+	if (cldebug) 
+	    eprintf ("startblock: ifseen=%d\n", ifseen);
 
 	if (!ifseen) {
 	    ip_cmdblk = op_cmdblk = cmdblk;
@@ -191,15 +192,13 @@ curcmd (void)
  *   the next character from the right place.  This is either done directly
  *   or by a call to yy_startblock.
  */
-
-
-int 
+int
 get_command (FILE *fp)
 {
 	register char *ip, *op;
 	char	raw_cmd[SZ_LINE+1];	/* buffer for raw command line	*/
 	char	new_cmd[SZ_CMDBLK+1];	/* temporary for processed cmd	*/
-	int	execute=1, temp, status, n;
+	int	execute=1, temp, status;
 
 	if (!(currentask->t_flags & T_INTERACTIVE)  ||
 	    parse_state == PARSE_PARAMS) {
@@ -245,14 +244,12 @@ get_command (FILE *fp)
 
 	    if (cldebug || echocmds())
 		eprintf ("%s", status == EOF ? "bye\n" : cmdblk);
-		
+
 	    return (status);
 	}
 
-
 	raw_cmd[SZ_LINE] = '\0';
 	while (YES) {
-
 	    /* Prompt the user for a new command if the input buffer is empty.
 	     * The CL prompt clears raw mode in case it is left in effect by a
 	     * program abort.
@@ -260,6 +257,7 @@ get_command (FILE *fp)
 input_:
 	    /* Read the next command line. 
 	     */
+
 	    if (eh_readline == NO) {
 	        if (c_fstati (fileno(fp), F_UNREAD) == 0) {
 		    if (c_fstati ((XINT)STDIN, F_RAW) == YES)
@@ -276,7 +274,6 @@ input_:
 	    } else {
 		extern char epar_cmdbuf[];
 
-
 		/* If the epar/ehist command buffer is full, process that
 		 * rather than taking input from the terminal.
 		 */
@@ -288,10 +285,9 @@ input_:
 		    epar_cmdbuf[0] = '\0';
 
 		} else {
-		    char  *cmd = (char *)NULL;
+		    char *cmd = (char *)NULL;
 
 		    get_prompt((cmdblk_line==0) ? curpack->pk_name : NOCLOSURE);
-
     		    if ((cmd = freadline (prompt)) == (char *)NULL)
 			return (EOF);
 
@@ -446,7 +442,7 @@ add_history (char *buf)    { }
  * (no execute) as the function value.  Any text which follows the directive
  * is appended to the new command block.
  */
-int 
+int
 process_history_directive (char *directive, char *new_command_block)
 {
 	register char *ip, *op, *p;
@@ -528,7 +524,7 @@ process_history_directive (char *directive, char *new_command_block)
  * The "repeat last command" directive "^" is a special case: the null string
  * matches anything.
  */
-int 
+int
 search_history (char *directive, char *new_command_block)
 {
 	register char *ip, *op, *p;
@@ -602,7 +598,7 @@ search_history (char *directive, char *new_command_block)
  * The first character in the edit directive is taken to be the edit
  *   metacharacter (i.e., "^", "/", etc.).
  */
-int 
+int
 stredit (
     char *edit_directive,		/* e.g., "^str1^str2^"		*/
     char *in_text,			/* text to be edited		*/
@@ -706,7 +702,7 @@ stredit (
  *   will not be what the user wanted (but then they probably screwed up).
  * The function returns true if any macros were expanded.
  */
-int 
+int
 expand_history_macros (char *in_text, char *out_text)
 {
 	register char *ip, *op, *ap;
@@ -714,21 +710,20 @@ expand_history_macros (char *in_text, char *out_text)
 	int	nargs=0, nrep=0, argno=0, have_arg_strings=0;
 	char	*index();
 
-
 	/* Copy the command text.  Fetch argument strings from history only
 	 * if a history macro is found.  Otherwise the copy is very fast.
 	 */
 	for (ip=in_text, op=out_text;  (*op = *ip) != EOS;  ip++, op++) {
-	    if (*ip == '"') {			/* span literal strings	*/
-		while (1) {
-		   *op++ = *ip++;
-		   if (*ip == '"' && *(ip+1) != '"') {
-		       *op = *ip;
-			break;
-		   }
-		}
-		continue;
-	    } else if (*ip == HISTCHAR) {
+            if (*ip == '"') {                   /* span literal strings */
+                while (1) {
+                   *op++ = *ip++;
+                   if (*ip == '"' && *(ip+1) != '"') {
+                       *op = *ip;
+                        break;
+                   }
+                }
+                continue;
+            } else if (*ip == HISTCHAR) {
 		if (ip > in_text && *(ip-1) == '\\') {
 		    *(--op) = HISTCHAR;				/* \^	*/
 		    continue;
@@ -793,7 +788,7 @@ expand_history_macros (char *in_text, char *out_text)
  * NOTE -- The input argument list is modified (the argp[i] point into it).
  * NOTE -- This procedure is used elsewhere in the CL to parse argument lists.
  */
-int 
+int
 get_arglist (
     char *cmdblk,		/* buffer to store argument list in	*/
     char *argp[]		/* receives argument pointers		*/
@@ -830,7 +825,7 @@ get_arglist (
  * chars into histbuf in circular buffer fashion, overwriting old history
  * data.  EOS delimits records in the history buffer.
  */
-void 
+void
 put_history (char *command)
 {
 	register char *ip, *op, *otop;
@@ -862,7 +857,7 @@ put_history (char *command)
 /* GET_HISTORY -- Fetch the indicated command from the history buffer,
  * returning OK if found, ERR otherwise.
  */
-int 
+int
 get_history (int record, char *command, int maxch)
 {
 	char	*recptr;
@@ -882,7 +877,7 @@ get_history (int record, char *command, int maxch)
  * from the history buffer into the user buffer (the latter is a nice,
  * well behaved linear rather than circular buffer).
  */
-void 
+void
 fetch_history (char *recptr, char *command, int maxch)
 {
 	register char	*ip, *op, *itop;
@@ -894,7 +889,6 @@ fetch_history (char *recptr, char *command, int maxch)
 	n    = ((maxch < SZ_HISTBUF) ? maxch : SZ_HISTBUF) - 1;
 
 	while (--n >= 0 && ((*op = *ip++) != EOS) ) {
-	    /* *op++; */
 	    op++;
 	    if (ip >= itop)
 		ip = histbuf;
@@ -976,7 +970,7 @@ find_history (int record)
  * stream, preceeding each command block with a 3 digit command number.
  * Show at most min (max_commands, MAX_SHOWHIST) command blocks.
  */
-void 
+void
 show_history (FILE *fp, int max_commands)
 {
 	char	*recptr[MAX_SHOWHIST];
@@ -1012,7 +1006,7 @@ show_history (FILE *fp, int max_commands)
  * ">>> ".  Also print, before the prompt, all ltasks in current package
  * if menus() are enabled and a new package has been invoked.
  */
-void 
+void
 pprompt (register char *string)
 {
 	static	struct package *lastpack = NULL;
@@ -1069,7 +1063,7 @@ get_prompt (register char *string)
  * is opened and closed each time a record is appended to the file, allowing
  * other processes to access the same file.
  */
-void 
+void
 put_logfile (char *command)
 {
 	FILE	*fp;
@@ -1100,7 +1094,7 @@ put_logfile (char *command)
  * timestamp new session.  The logfile grows without bounds unless the
  * user deletes it or starts a new one.
  */
-int 
+int
 open_logfile (char *fname)
 {
 	if (logfp != NULL)
@@ -1123,7 +1117,7 @@ open_logfile (char *fname)
 
 /* CLOSE_LOGFILE -- Print termination message and close logfile.
  */
-void 
+void
 close_logfile (char *fname)
 {
 	register FILE *fp;
@@ -1149,7 +1143,7 @@ close_logfile (char *fname)
 /* RESET_LOGFILE -- The name of the logfile has been reset by the user.
  * Close and reopen the logfile, but only if share_logfile option is off.
  */
-void 
+void
 reset_logfile (void)
 {
 	if (!share_logfile) {
@@ -1162,7 +1156,7 @@ reset_logfile (void)
 /* PRINT_COMMAND -- Print a (possibly multiline) command to the same left
  * margin as when it was entered.
  */
-void 
+void
 print_command (
     register FILE *fp,
     char *command,
@@ -1195,7 +1189,7 @@ today (void)
 
 /* WHAT_RECORD -- Return the record number of the last edited history
  */
-int 
+int
 what_record (void)
 {
 	return (history_number);
@@ -1206,7 +1200,7 @@ what_record (void)
  * the putlog builtin (clputlog() in builtin.c) and in some places in the
  * CL (e.g., exec.c).
  */
-void 
+void
 putlog (
     struct task *tp,		/* pointer to task or NULL */
     char *usermsg
